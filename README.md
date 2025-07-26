@@ -12,6 +12,8 @@ This script automates that entire process, intelligently handling all token bala
 
 **Author:** https://github.com/xa-io
 
+**Last Updated:** 2025-07-26 00:11:50
+
 ## Features
 
 ### Core Functionality
@@ -31,7 +33,8 @@ This script automates that entire process, intelligently handling all token bala
 
 ### Safety Features
 - **Dry Run Mode**: Test liquidation logic without placing actual orders
-- **User Confirmation**: Requires explicit confirmation before executing liquidations
+- **User Confirmation**: Requires explicit confirmation before executing liquidations (can be disabled)
+- **Automated Execution**: Optional AUTO_CONFIRM_LIQUIDATION for non-interactive environments
 - **Rate Limiting**: Built-in delays between API calls and order placements
 - **Error Handling**: Comprehensive exception handling with detailed error messages
 
@@ -41,7 +44,8 @@ This script automates that entire process, intelligently handling all token bala
 - `DELAY_BETWEEN_ORDERS = 0.2` - Seconds between order placements (rate limiting)
 - `DRY_RUN_MODE = False` - Set to True to simulate without placing orders
 - `EXCLUDED_PAIRS = ["BTC", "ETH", "SOL"]` - Assets to exclude from liquidation
-- `SHOW_UNSELLABLE_ASSETS = True` - Show unsellable assets (✗) in logs
+- `SHOW_UNSELLABLE_ASSETS = False` - Show unsellable assets (✗) in logs
+- `AUTO_CONFIRM_LIQUIDATION = False` - Set to True to skip confirmation prompt and auto-liquidate
 
 ### File Configuration
 - `PRODUCTS_FILE = "products.json"` - File to store Coinbase product information
@@ -201,42 +205,46 @@ The script automatically handles different base increment requirements:
 
 ## Version History
 
-### v1.06 (2025-01-25 21:37:00) - FRESH DATA IMPLEMENTATION
+### v1.07 (2025-07-26 00:11:50) - AUTO_CONFIRM_LIQUIDATION & README UPDATE
+- **NEW FEATURE**: Added AUTO_CONFIRM_LIQUIDATION for non-interactive environments
+- **README UPDATE**: Updated README with v1.07 timestamp and new feature documentation
+
+### v1.06 (2025-07-25 21:37:00) - FRESH DATA IMPLEMENTATION
 - **MAJOR ENHANCEMENT**: Forces fresh products and active pairs data on every run
 - Eliminates stale data issues that could cause INVALID_PRICE_PRECISION errors
 - Ensures accurate base_increment and quote_increment values for all calculations
 - All product info lookups use current data for accurate decimal precision
 
-### v1.05 (2025-01-25 21:23:15) - CODE SIMPLIFICATION
+### v1.05 (2025-07-25 21:23:15) - CODE SIMPLIFICATION
 - **IMPROVED PRODUCT INFO HANDLING**: Simplified decimal precision logic
 - More reliable product info fetching using direct API access
 - Cleaner code that's easier to maintain and debug
 - Same precision accuracy with simplified logic
 
-### v1.04 (2025-01-25 21:18:45) - LIMIT ORDER FALLBACK FIX
+### v1.04 (2025-07-25 21:18:45) - LIMIT ORDER FALLBACK FIX
 - **BUG FIX**: Fixed "name 'load_products' is not defined" error in limit order fallback
 - Changed incorrect function call to ensure_products_file() in place_limit_order_fallback()
 - Limit order fallback now works correctly for TIME-USD, INV-USD, and other limit-only pairs
 
-### v1.03 (2025-01-25 21:14:30) - LIMIT ORDER FALLBACK & LOG CONTROL
+### v1.03 (2025-07-25 21:14:30) - LIMIT ORDER FALLBACK & LOG CONTROL
 - **NEW FEATURE**: Added limit order fallback for pairs in limit-only mode
 - Places limit orders 10% below market price using public order book data
 - Added SHOW_UNSELLABLE_ASSETS config to control log verbosity
 - Proper decimal precision ensures orders are accepted by Coinbase API
 
-### v1.02 (2025-01-25 21:05:15) - AUTOMATED ACTIVE PAIRS DETECTION
+### v1.02 (2025-07-25 21:05:15) - AUTOMATED ACTIVE PAIRS DETECTION
 - **MAJOR IMPROVEMENT**: Replaced manual active_pairs.txt with automated detection
 - Dynamically filters for pairs with status="online" and trading_disabled=false
 - Increased liquidation candidates from 1 asset to 14 assets
 - Future-proof solution that adapts to new Coinbase trading pairs automatically
 
-### v1.01 (2025-01-25 20:51:45) - CRITICAL ORDER SUCCESS FIX
+### v1.01 (2025-07-25 20:51:45) - CRITICAL ORDER SUCCESS FIX
 - **MAJOR BUG FIX**: Fixed critical order success detection logic
 - Orders were succeeding but being marked as failed due to incorrect API response interpretation
 - Now correctly identifies successful orders and logs order IDs for tracking
 - Eliminates false failure reports when orders are actually successful
 
-### v1.00 (2025-01-25 20:33:39) - INITIAL RELEASE
+### v1.00 (2025-07-25 20:33:39) - INITIAL RELEASE
 - **COMPREHENSIVE LIQUIDATION SCRIPT**: Universal balance detection using portfolio endpoint
 - Base increment validation from products.json with 4-hour auto-refresh
 - Trading-enabled pair filtering for active USD pairs
