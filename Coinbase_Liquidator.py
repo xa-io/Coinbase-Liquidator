@@ -7,12 +7,12 @@
 #  ╚██████╗╚██████╔╝██║██║ ╚████║██████╔╝██║  ██║███████║███████╗                          
 #   ╚═════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝                          
 #                                                                                                                
-#  ██╗     ██╗ ██████╗ ██╗   ██╗██╗██████╗  █████╗ ████████╗ ██████╗ ██████╗     ██╗   ██╗ ██╗    ██████╗  ██████╗ 
-#  ██║     ██║██╔═══██╗██║   ██║██║██╔══██╗██╔══██╗╚══██╔══╝██╔═══██╗██╔══██╗    ██║   ██║███║   ██╔═████╗██╔════╝ 
-#  ██║     ██║██║   ██║██║   ██║██║██║  ██║███████║   ██║   ██║   ██║██████╔╝    ██║   ██║╚██║   ██║██╔██║███████╗ 
-#  ██║     ██║██║▄▄ ██║██║   ██║██║██║  ██║██╔══██║   ██║   ██║   ██║██╔══██╗    ╚██╗ ██╔╝ ██║   ████╔╝██║██╔═══██╗
-#  ███████╗██║╚██████╔╝╚██████╔╝██║██████╔╝██║  ██║   ██║   ╚██████╔╝██║  ██║     ╚████╔╝  ██║██╗╚██████╔╝╚██████╔╝
-#  ╚══════╝╚═╝ ╚══▀▀═╝  ╚═════╝ ╚═╝╚═════╝ ╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝      ╚═══╝   ╚═╝╚═╝ ╚═════╝  ╚═════╝ 
+#  ██╗     ██╗ ██████╗ ██╗   ██╗██╗██████╗  █████╗ ████████╗ ██████╗ ██████╗     ██╗   ██╗ ██╗    ██████╗ ███████╗
+#  ██║     ██║██╔═══██╗██║   ██║██║██╔══██╗██╔══██╗╚══██╔══╝██╔═══██╗██╔══██╗    ██║   ██║███║   ██╔═████╗╚════██║
+#  ██║     ██║██║   ██║██║   ██║██║██║  ██║███████║   ██║   ██║   ██║██████╔╝    ██║   ██║╚██║   ██║██╔██║    ██╔╝
+#  ██║     ██║██║▄▄ ██║██║   ██║██║██║  ██║██╔══██║   ██║   ██║   ██║██╔══██╗    ╚██╗ ██╔╝ ██║   ████╔╝██║   ██╔╝ 
+#  ███████╗██║╚██████╔╝╚██████╔╝██║██████╔╝██║  ██║   ██║   ╚██████╔╝██║  ██║     ╚████╔╝  ██║██╗╚██████╔╝   ██║  
+#  ╚══════╝╚═╝ ╚══▀▀═╝  ╚═════╝ ╚═╝╚═════╝ ╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝      ╚═══╝   ╚═╝╚═╝ ╚═════╝    ╚═╝ 
 #
 # Coinbase Liquidator - Automated Portfolio Liquidation Script
 # Converts all token balances to USD in one click - the "dust converter" Coinbase doesn't provide
@@ -31,13 +31,14 @@
 # • Dynamic trading pair detection with fresh data on every run
 # • Comprehensive error handling and detailed logging
 #
-# Coinbase Liquidator v1.06
+# Coinbase Liquidator v1.07
 # Automated dust liquidation and portfolio exit script for Coinbase
 # Created by: https://github.com/xa-io
-# Last Updated: 2025-07-25 22:19:16
+# Last Updated: 2025-07-26 00:11:50
 #
 # ## Release Notes ##
 #
+# v1.07 - Added AUTO_CONFIRM_LIQUIDATION config to skip user confirmation prompt for automated runs
 # v1.06 - Forces fresh products and active pairs data on every run, eliminating stale data issues
 # v1.05 - Simplified decimal precision logic for cleaner, more maintainable code
 # v1.04 - Fixed limit order fallback function call for limit-only pairs
@@ -55,13 +56,14 @@
 # Order placement settings
 DELAY_BETWEEN_ORDERS = 0.2               # Seconds between order placements (rate limiting)
 DRY_RUN_MODE = False                     # Set to True to simulate without placing orders
-EXCLUDED_PAIRS = ["BTC", "ETH", "SOL"]    # Assets to exclude from liquidation
+EXCLUDED_PAIRS = ["BTC", "ETH", "SOL"]   # Assets to exclude from liquidation
 SHOW_UNSELLABLE_ASSETS = False           # Show unsellable assets (✗) in logs
+AUTO_CONFIRM_LIQUIDATION = False         # Set to True to skip confirmation prompt and auto-liquidate
 
 # File configuration
 PRODUCTS_FILE = "products.json"          # File to store Coinbase product information
 PRODUCTS_MAX_AGE_HOURS = 4               # Hours before refreshing products file
-FORCE_FRESH_DATA = True                  # Force fresh products and pairs data on each run
+FORCE_FRESH_DATA = False                 # Force fresh products and pairs data on each run
 ACTIVE_PAIRS_FILE = "active_pairs.txt"   # File containing trading-enabled pairs
 
 # API settings
@@ -70,8 +72,8 @@ RATE_LIMIT_DELAY = 2.0                   # Wait time when rate limit exceeded
 MAX_RETRIES = 3                          # Maximum retries for API calls
 
 # Logging settings
-DEBUG = False                             # Enable debug logging
-SHOW_TIMESTAMP = False                    # Show timestamps in logs
+DEBUG = False                            # Enable debug logging
+SHOW_TIMESTAMP = False                   # Show timestamps in logs
 
 #########################################
 #### End of Configuration Parameters ####
@@ -730,6 +732,8 @@ def liquidate_portfolio():
     log("-"*60)
     if DRY_RUN_MODE:
         log(f"[DRY RUN] Would proceed with liquidating {len(liquidation_candidates)} assets (${total_liquidation_value:.2f})")
+    elif AUTO_CONFIRM_LIQUIDATION:
+        log(f"Auto-liquidating {len(liquidation_candidates)} assets (${total_liquidation_value:.2f})...")
     else:
         try:
             response = input(f"Proceed with liquidating {len(liquidation_candidates)} assets (${total_liquidation_value:.2f})? [y/N]: ")
